@@ -1,0 +1,25 @@
+\section{Discussion and Threats to Validity}
+\label{sec:discussion}
+
+The empirical findings and architectural design of SecretGuard highlight key trade-offs in Developer Security Operations (DevSecOps) and point to fundamental considerations regarding usability, privacy, and system boundaries.
+
+\subsection{Balancing Velocity and Semantic Precision}
+The persistent failure of traditional static analysis tools to achieve frictionless developer adoption stems directly from the speed-versus-accuracy trade-off identified by Johnson et al.~\cite{johnson2013why}. If a security gate blocks commits for multiple seconds, developers will bypass it with \texttt{-{}-no-verify} or disable pre-commit hooks entirely. By implementing the closed-form ambiguity equation (Equation~\ref{eq:ambiguity}), SecretGuard achieves a principled equilibrium: the vast majority of unambiguous production credentials resolve locally in single-digit milliseconds ($5.65$\,ms for 100 lines), preserving developer velocity. Only candidates with measurable syntactic or contextual ambiguity incur the latency of an LLM query, and even then, queries are delegated to ultra-fast profiles (Groq \texttt{llama-3.1-8b-instant}) bounded to 2.0-second timeouts.
+
+\subsection{The Privacy-Bounded Zero-Trust Paradigm}
+Transmitting enterprise source code to commercial cloud AI providers poses severe IP leakage and regulatory compliance risks. SecretGuard enforces a strict zero-trust boundary:
+\begin{enumerate}
+    \item \textbf{No Whole-File Telemetry:} The repository structure and file contents never leave the host machine.
+    \item \textbf{Strict Bounded Context:} At most 200 characters of immediate surrounding context are provided to the model.
+    \item \textbf{Token Masking:} High-privilege tokens in logs, console outputs, and error traces are scrubbed in memory.
+\end{enumerate}
+
+\subsection{Threats to Validity}
+\subsubsection{Internal Validity}
+Internal validity concerns whether the observed performance and routing behavior are genuine functions of the system design rather than experimental artifacts. In our micro-benchmarks, we evaluated synthetic diffs constructed with realistic code distributions and repeated each measurement across 20 independent trials. Furthermore, the test suite achieves complete coverage across deterministic extraction, ignore matching, rate limiting, and quarantine refactoring.
+
+\subsubsection{External Validity}
+External validity concerns whether these results generalize to arbitrary software repositories across different programming languages and organizational cultures. While the core deterministic engine and ambiguity scoring are language-agnostic, the current automated code sanitization engine natively supports Python and JavaScript/TypeScript. Applying automated in-place AST refactoring to statically typed languages (such as Go, Rust, or C++) requires language-specific import injection (e.g., adding \texttt{"os"} or \texttt{std::env}) and error-handling semantics, which represents an area of active ongoing development.
+
+\subsubsection{Construct Validity}
+Construct validity assesses whether our evaluation metrics accurately reflect the true real-world utility of the tool. While micro-benchmark latency and test pass rates confirm architectural feasibility, they do not directly measure the reduction of developer alert fatigue in longitudinal human-subject studies. Evaluating developer trust and bypass rates in enterprise deployments constitutes an important direction for future research.

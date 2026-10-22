@@ -1,0 +1,18 @@
+\section{Limitations and Evaluation Gaps}
+\label{sec:limitations}
+
+In accordance with rigorous academic integrity and the evaluation protocol established in our audit, this section explicitly delineates the current empirical limitations of our evaluation and presents the planned benchmark protocol.
+
+\subsection{Absence of Large-Scale Benchmark Ground-Truth Evaluation}
+While SecretGuard's unit test suite (112 test cases) and micro-benchmarks confirm that the mathematical scoring model successfully discriminates test fixtures from production credentials on isolated samples, the system has not yet been systematically evaluated against large-scale public ground-truth corpora such as \texttt{SecretBench} (Basak et al.~\cite{basak2023comparative}). Consequently, while marketing claims of ``near-zero false alarms'' exist in product documentation, we explicitly refrain from asserting empirical F1-score superiority over mature static scanners such as Gitleaks or TruffleHog until such comparative trials are conducted.
+
+\subsection{Proposed Future Empirical Benchmark Protocol}
+To address this evaluation gap, we outline a concrete, reproducible evaluation protocol to be executed in subsequent studies:
+\begin{enumerate}
+    \item \textbf{Ground-Truth Dataset Ingestion:} Evaluate SecretGuard against the complete \texttt{SecretBench} and \texttt{FPSecretBench} repositories~\cite{basak2023comparative}, comprising thousands of validated true-positive and false-positive instances across diverse languages.
+    \item \textbf{Comparative Baselines:} Benchmark SecretGuard in two configurations---Deterministic Offline Mode ($S_{amb} < 0.20$ rules only) and Full Adaptive Mode (with Profile A and Profile B LLM verification)---directly against Gitleaks v8.18+, TruffleHog v3.60+, and Yelp \texttt{detect-secrets} v1.4+.
+    \item \textbf{Statistical Metrics:} Compute Precision, Recall, and F1-score alongside the ratio of network calls $\rho_{net} = \frac{N_{\text{LLM}}}{N_{\text{Total}}}$ to quantify the exact reduction in false alarms and cloud invocation overhead.
+\end{enumerate}
+
+\subsection{Scope of Automated In-Place Refactoring}
+The current automated quarantine engine operates on regular expression AST heuristics for Python and JavaScript/TypeScript files. In scenarios involving complex multi-line string interpolations, nested dictionary configurations, or languages with mandatory error handling (e.g., Go's \texttt{os.Getenv} or Rust's \texttt{std::env::var().unwrap()}), automated in-place replacement requires AST synthesis to avoid introducing syntax or compilation errors. Expanding the remediation engine to robust compiler-backed AST transformations is planned for future work.

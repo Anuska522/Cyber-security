@@ -1,0 +1,29 @@
+\section{Implementation Details}
+\label{sec:implementation}
+
+SecretGuard is implemented as a standalone, enterprise-ready Python package targeting Python 3.11+. The system is structured into modular components adhering strictly to SOLID design principles and zero-trust security invariants.
+
+\subsection{Data Models and Zero-Allocation Ingestion}
+Core entities are defined using strict typed dataclasses and Pydantic models in \texttt{secretguard.core.models}. The primary entity, \texttt{SecretCandidate}, encapsulates the raw literal value, relative file path, line number, bounded surrounding context, rule identifier, computed Shannon entropy score, and pre-filter flags. To guarantee bounded memory utilization even when scanning large synthetic diffs, ingestion is implemented as an on-demand generator, yielding one \texttt{DiffLine} at a time rather than allocating a full parse tree in memory.
+
+\subsection{Verification Gateway and Key Management}
+The verification gateway (\texttt{secretguard.gateway}) coordinates external model calls:
+\begin{itemize}
+    \item \textbf{Round-Robin Key Rotation:} The \texttt{KeyManager} cycles through pools of registered API keys across supported providers (Groq, OpenRouter, Google Gemini), load-balancing queries across credentials.
+    \item \textbf{Adaptive Throttling:} Upon encountering an HTTP 429 (Rate Limit Exceeded) status code, the key is dynamically placed in a throttled state with exponential backoff, and execution immediately advances to the next available key.
+    \item \textbf{Fail-Safe Quota Exhaustion:} If an HTTP 403 (Forbidden / Quota Depleted) error occurs or all keys in a provider pool are exhausted, the gateway logs a redacted warning and falls back to deterministic local resolution. This fail-safe architecture ensures that third-party network outages or exhausted credits never block a developer's commit.
+\end{itemize}
+
+\subsection{Zero-Leakage Logging and Redaction}
+To prevent intercepted credentials from inadvertently leaking into terminal histories or log aggregators, \texttt{secretguard.logging.redaction} implements a custom logging \texttt{Filter}. All intercepted candidate strings, raw AWS keys, and OpenAI tokens detected in log record messages or argument structures are automatically scrubbed and replaced with masked tokens (e.g., \texttt{AKIA••••••••••••}) before emission.
+
+\subsection{Configuration and POSIX Permissions}
+Configuration is managed via \texttt{secretguard/config/settings.py}, supporting hierarchical overrides from YAML configuration files (\texttt{\~{}/.config/secretguard/config.yaml}) and environment variables. On POSIX-compliant systems, configuration files and secret vaults are strictly validated for owner read/write permissions (\texttt{0600}), rejecting insecure multi-user permissions. On Windows platforms, the configuration loader gracefully falls back to user-scoped ACLs.
+
+\subsection{Standardized Telemetry Export}
+For automated integration into enterprise DevSecOps pipelines and GitHub Advanced Security, SecretGuard implements native serializers in \texttt{secretguard.reporting}:
+\begin{itemize}
+    \item \textbf{OASIS SARIF v2.1.0:} Compliant with the Static Analysis Results Interchange Format standard~\cite{oasis2020sarif}, producing structured vulnerability trees compatible with GitHub CodeQL Action and CI/CD security dashboards.
+    \item \textbf{Structured JSON:} Provides machine-readable diagnostic summaries including candidate counts, filtered statistics, ambiguity routing breakdowns, and execution timings.
+    \item \textbf{TrueColor Terminal Interface:} A cyber-minimalist terminal UI utilizing ANSI TrueColor gradient banners and box-drawing characters without emoji clutter.
+\end{itemize}

@@ -1,0 +1,52 @@
+\documentclass[10pt,journal,compsoc]{IEEEtran}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
+
+\begin{document}
+
+\title{SecretGuard: Autonomous, Privacy-Preserving Secret Interception and Tiered Ambiguity Quarantine for Version Control Systems}
+
+\author{Anuska~Saha%
+\thanks{The author is with the Department of Computer Science and Engineering. Email: correspondence@example.org. Code and reproducibility artifacts are available in the project repository.}%
+}
+
+\markboth{IEEE Transactions on Software Engineering,~Vol.~XX, No.~X,~October~2026}%
+{Saha: SecretGuard: Autonomous Secret Interception and Quarantine}
+
+\maketitle
+
+\input{sections/abstract.tex}
+
+\begin{IEEEkeywords}
+Secret Detection, DevSecOps, Static Application Security Testing, Git Pre-Commit, Shannon Entropy, Adaptive Routing, Automated Remediation.
+\end{IEEEkeywords}
+
+\input{sections/introduction.tex}
+\input{sections/related_work.tex}
+\input{sections/method.tex}
+\input{sections/implementation.tex}
+\input{sections/evaluation.tex}
+\input{sections/discussion.tex}
+\input{sections/limitations.tex}
+\input{sections/conclusion.tex}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

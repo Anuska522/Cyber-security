@@ -1,0 +1,44 @@
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.92\linewidth,
+    height=6.2cm,
+    xlabel={Diff Size (Unified Diff Added Lines)},
+    ylabel={Scanning Latency (ms)},
+    xmin=0, xmax=1050,
+    ymin=0, ymax=65,
+    xtick={0, 100, 250, 500, 750, 1000},
+    ytick={0, 10, 20, 30, 40, 50, 60},
+    legend pos=north west,
+    ymajorgrids=true,
+    grid style=dashed,
+    font=\small
+]
+
+\addplot[
+    color=blue!80!black,
+    mark=square*,
+    thick
+]
+coordinates {
+    (10, 0.666)
+    (50, 3.028)
+    (100, 5.646)
+    (250, 14.517)
+    (500, 29.048)
+    (1000, 58.199)
+};
+\addlegendentry{Measured Execution Latency}
+
+\addplot[
+    color=red!70!black,
+    dashed,
+    thick
+]
+coordinates {
+    (0, 15)
+    (1050, 15)
+};
+\addlegendentry{Interactive Pre-Commit Target (15ms)}
+
+\end{axis}
+\end{tikzpicture}

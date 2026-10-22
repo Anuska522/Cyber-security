@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# LaTeX build artifacts (keep main.pdf, .tex, .bib, .tikz)
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Environment and sensitive files
+.env
+.env.*
+*.key
+*.pem
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

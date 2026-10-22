@@ -1,0 +1,39 @@
+\section{Related Work and Background}
+\label{sec:related_work}
+
+The persistent challenge of securing credentials in version control systems has spurred substantial academic and industrial investigation. In this section, we review the taxonomy of existing secret detection methodologies and contrast them with SecretGuard.
+
+\subsection{Static Signature and Entropy Scanners}
+The earliest automated scanners relied on combining regular expressions matching known token prefixes with mathematical Shannon entropy~\cite{shannon1948mathematical} to identify pseudo-random high-density strings. Tools such as Gitleaks~\cite{rice2018gitleaks} and early versions of TruffleHog~\cite{ayrey2016trufflehog} demonstrated that static scanning could be performed locally without third-party network services. However, as demonstrated empirically by Basak et al.~\cite{basak2023comparative} on the \texttt{SecretBench} benchmark, static approaches face an inherent trade-off: broadening regular expressions to capture generic API keys results in an explosion of false positives, flagging documentation examples, test fixtures, and mock strings. Conversely, tightening regular expressions leads to missed zero-day and uncataloged secrets.
+
+\subsection{Baseline and Differential Scanning}
+To prevent legacy codebases from perpetually failing security gates, Yelp developed \texttt{detect-secrets}~\cite{yelp2019detectsecrets}. This tool introduced baseline tracking (\texttt{.secrets.baseline}), recording pre-existing historical secrets so that pre-commit hooks only inspect new code additions. While differential scanning mitigates legacy noise, the underlying detection engine still depends on uncontextualized heuristics, offering no dynamic semantic reasoning or automated code remediation.
+
+\subsection{Dynamic Key Verification}
+Modern iterations of TruffleHog~\cite{ayrey2016trufflehog} introduced dynamic key validation, wherein the scanner issues active HTTP requests to external service providers (e.g., querying the AWS Security Token Service or GitHub API) to verify whether an intercepted token is active. While dynamic validation eliminates false alarms from revoked or dummy keys, it introduces substantial latency (frequently multiple seconds per candidate), exposes live tokens to network sniffing, and fails completely in offline, air-gapped, or internal corporate environments.
+
+\subsection{Hybrid Machine Learning and LLM Scanners}
+Recent work has investigated leveraging deep learning and Large Language Models for secret detection. Shahriyar et al.~\cite{shahriyar2025secret} evaluated fine-tuned open-source models (such as LLaMA-3.1 8B) for binary classification of source code candidates, achieving high F1-scores. Similarly, Chatterjee and Moran~\cite{chatterjee2024secretleak} analyzed credential leakage in unstructured developer communications. However, naively integrating LLMs into client-side pre-commit hooks creates significant latency penalties and data privacy risks when complete functions or files are uploaded to external cloud endpoints.
+
+\subsection{Taxonomic Comparison}
+Table~\ref{tab:comparison} summarizes the comparative landscape across key operational and scientific dimensions. SecretGuard occupies a unique position by integrating a closed-form ambiguity routing metric ($S_{amb}$), strict $\le 200$-character privacy bounding, and an autonomous code quarantine engine.
+
+\begin{table*}[t]
+\centering
+\caption{Comparative Analysis of Secret Detection Paradigms vs. SecretGuard.}
+\label{tab:comparison}
+\small
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Dimension} & \textbf{Static Scanners} & \textbf{Baseline Scanners} & \textbf{Active Verifiers} & \textbf{LLM Scanners} & \textbf{SecretGuard} \\
+& (Gitleaks~\cite{rice2018gitleaks}) & (detect-secrets~\cite{yelp2019detectsecrets}) & (TruffleHog~\cite{ayrey2016trufflehog}) & (Shahriyar~\cite{shahriyar2025secret}) & \textbf{(This Work)} \\
+\midrule
+Commit Latency & $< 20$\,ms & $< 50$\,ms & $1,000$--$5,000$\,ms & $1,000$--$3,000$\,ms & \textbf{$< 15$\,ms ($5.65$\,ms meas.)} \\
+Ambiguity Scoring & None (Binary) & None & None & Implicit & \textbf{Closed-Form ($S_{amb}$)} \\
+Network Overhead & None (0\,ms) & None (0\,ms) & High (Every key) & High (Every token) & \textbf{0\,ms for $S_{amb} < 0.20$; Tiered} \\
+Privacy Bounding & 100\% Local & 100\% Local & Sends keys to APIs & Full code context & \textbf{Strict $\le 200$ chars; Zero full upload} \\
+Automated Quarantine & None (Manual) & None (Manual) & None (Manual) & None (Diagnostic) & \textbf{1-Click AST Rewrite + \texttt{.env}} \\
+Standard Telemetry & SARIF / JSON & JSON & JSON & Custom & \textbf{OASIS SARIF v2.1.0~\cite{oasis2020sarif}} \\
+\bottomrule
+\end{tabular}
+\end{table*}

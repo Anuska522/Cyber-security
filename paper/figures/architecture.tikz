@@ -1,0 +1,37 @@
+\begin{tikzpicture}[
+    node distance=1.2cm and 1.5cm,
+    every node/.style={font=\small},
+    block/.style={rectangle, draw=blue!70!black, fill=blue!5, thick, rounded corners=3pt, minimum width=3.8cm, minimum height=1.0cm, align=center},
+    decision/.style={diamond, draw=orange!80!black, fill=orange!10, thick, aspect=1.8, inner sep=2pt, align=center},
+    action/.style={rectangle, draw=green!60!black, fill=green!5, thick, rounded corners=3pt, minimum width=3.2cm, minimum height=0.9cm, align=center},
+    route/.style={rectangle, draw=purple!70!black, fill=purple!5, thick, rounded corners=3pt, minimum width=3.2cm, minimum height=0.9cm, align=center},
+    line/.style={draw, -latex, thick}
+]
+
+% Nodes
+\node [block] (input) {\textbf{Staged Git Diff Stream}\\(\texttt{git diff -{}-cached})};
+
+\node [block, below of=input] (ingest) {\textbf{Diff Streaming Ingestion}\\\textit{Filter additions (+), Ignore non-code}};
+
+\node [block, below of=ingest] (det) {\textbf{Deterministic Extraction Engine}\\\textit{15+ Regex Rules, Shannon Entropy $H(X)$,}\\\textit{Pre-Filters \& Bounded Context $\le 200$ chars}};
+
+\node [decision, below of=det, node distance=1.8cm] (scorer) {\textbf{Ambiguity Scorer}\\$S_{amb} = w_1 U_{reg} + w_2 \hat{H} + w_3 A_{ctx}$};
+
+% Left branch: Unambiguous
+\node [action, below left of=scorer, node distance=2.8cm, xshift=-0.5cm] (local) {\textbf{Local Resolution}\\\textit{Unambiguous Tier ($S < 0.2$)}\\\textbf{0ms Network Latency}};
+
+% Right branch: Tiered LLM routing
+\node [route, below right of=scorer, node distance=2.8cm, xshift=0.5cm] (router) {\textbf{Adaptive Model Gate}\\\textit{Profile A: Llama-3.1 8B ($0.2 \le S < 0.6$)}\\\textit{Profile B: GPT-4o-mini ($S \ge 0.6$)}};
+
+\node [block, below of=scorer, node distance=3.6cm] (remediation) {\textbf{Autonomous Remediation Engine}\\\textit{1-Click Quarantine: Code Sanitization (\texttt{os.getenv} / \texttt{process.env}),}\\\textit{\texttt{.env} Migration, \texttt{.gitignore} Protection, SARIF v2.1.0 Export}};
+
+% Connectors
+\path [line] (input) -- (ingest);
+\path [line] (ingest) -- (det);
+\path [line] (det) -- (scorer);
+\path [line] (scorer) -| node [near start, above] {$S_{amb} < 0.20$} (local);
+\path [line] (scorer) -| node [near start, above] {$S_{amb} \ge 0.20$} (router);
+\path [line] (local) |- (remediation);
+\path [line] (router) |- (remediation);
+
+\end{tikzpicture}

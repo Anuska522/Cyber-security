@@ -1,0 +1,31 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The proliferation of cloud computing platforms, distributed microservice architectures, and third-party Software-as-a-Service (SaaS) application programming interfaces (APIs) has fundamentally altered how software developers handle sensitive authentication material. To interact with cloud infrastructure (e.g., Amazon Web Services, Google Cloud, Microsoft Azure) or external artificial intelligence providers (e.g., OpenAI, Anthropic, Google), software systems require high-privilege access tokens, private keys, database connection strings, and API secrets. Despite widespread security advisories, developers routinely hardcode authentication tokens directly into source files during prototyping or rapid development.
+
+When these credentials are accidentally committed to version control systems like Git, the repercussions are instantaneous and severe. In a seminal empirical analysis of billions of files across public GitHub repositories, Meli et al.~\cite{meli2019howbad} demonstrated that credential leakage is pervasive, affecting over 100,000 repositories, with thousands of unique live credentials exposed on a daily basis. Once pushed to a public repository, credentials are scraped within seconds by automated adversarial botnets, exposing backend databases, storage buckets, and financial billing accounts to immediate exploitation.
+
+To mitigate this threat, modern DevSecOps practices emphasize ``shifting left''---intercepting secrets on the developer's local machine at the Git pre-commit boundary before code leaves the workstation. However, existing pre-commit tools face severe human-factors and architectural hurdles:
+\begin{enumerate}
+    \item \textbf{Alert Fatigue and False Positives:} Conventional static scanners (such as Gitleaks~\cite{rice2018gitleaks} or detect-secrets~\cite{yelp2019detectsecrets}) rely heavily on regular expressions and Shannon entropy calculations~\cite{shannon1948mathematical}. As documented in comprehensive benchmark evaluations by Basak et al.~\cite{basak2023comparative}, these static methods suffer from severe false-positive overheads, frequently flagging mock strings in test fixtures, compiled hash checksums, and documentation placeholders. As Johnson et al.~\cite{johnson2013why} demonstrated, persistent false alarms generate developer fatigue, leading software engineers to disable or bypass pre-commit hooks entirely.
+    \item \textbf{The Latency Penalty:} Developers execute Git commits frequently and expect interactive tools to finish almost instantaneously. While recent research has explored augmenting static analysis with Large Language Models (LLMs) to disambiguate context~\cite{shahriyar2025secret}, naively passing every line or token to a cloud API introduces latency penalties of hundreds or thousands of milliseconds, breaking interactive developer velocity.
+    \item \textbf{Intellectual Property and Privacy Risks:} Transmitting entire source files or surrounding code blocks to external cloud LLMs violates corporate data-governance policies and risks leaking proprietary intellectual property.
+    \item \textbf{The Remediation Vacuum:} Existing secret scanners are fundamentally passive: they flag an error in terminal logs, reject the commit, and abandon the developer to manually refactor the source code, extract the secret, configure environment variables, and update ignore files.
+\end{enumerate}
+
+\subsection{Research Questions}
+To address this multidimensional challenge, this paper investigates three central research questions:
+\begin{itemize}
+    \item \textbf{RQ1 (Architectural Feasibility):} Can a pre-commit secret interception engine achieve sub-15\,ms scanning latency on routine code commits while incorporating multi-pattern vendor regex extraction, mathematical Shannon entropy calculation, and syntactic context pre-filtering?
+    \item \textbf{RQ2 (Ambiguity Routing \& Privacy Bounding):} How can a hybrid security engine mathematically discriminate between unambiguous credentials, test mocks, and ambiguous tokens to safely minimize external LLM invocations and restrict context exposure to strictly $\le 200$ characters?
+    \item \textbf{RQ3 (Autonomous Remediation Viability):} What is the design and operational viability of an automated one-click secret quarantine mechanism that refactors source code into environment variable lookups while guaranteeing version control exclusion?
+\end{itemize}
+
+\subsection{Key Contributions}
+In this work, we present \textbf{SecretGuard}, an appliance-grade secret interception and autonomous quarantine platform. Our primary contributions are:
+\begin{enumerate}
+    \item \textbf{A Cyber-Minimalist, Low-Latency Pre-Commit Architecture:} A streaming unified diff ingestion pipeline that processes additions only, achieving a measured latency of $5.65$\,ms on 100-line diffs ($\sim 17,700$ lines/second throughput).
+    \item \textbf{A Mathematical Ambiguity Scoring \& Tiered Routing Framework:} A closed-form formulation $S_{amb} = w_1 U_{regex} + w_2 \hat{H} + w_3 A_{ctx}$ that resolves unambiguous credentials with 0\,ms network overhead and adaptively routes ambiguous candidates to tiered model profiles.
+    \item \textbf{A Privacy-Bounded Context Isolation Principle:} A strict $\le 200$-character windowing mechanism ensuring zero full-code uploads, paired with multi-provider key rotation, rate-limit backoff, and local log token redaction.
+    \item \textbf{An End-to-End Autonomous Quarantine \& Standards Reporting Pipeline:} A one-click remediation subsystem supporting Python and JavaScript/TypeScript code refactoring, synchronized \texttt{.env} migration, \texttt{.gitignore} enforcement, and OASIS SARIF v2.1.0 telemetry export.
+\end{enumerate}

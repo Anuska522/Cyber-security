@@ -1,0 +1,88 @@
+{
+  "timestamp": "2026-10-22T04:42:22Z",
+  "latency_throughput": {
+    "10": {
+      "avg_latency_ms": 0.666,
+      "std_latency_ms": 0.291,
+      "throughput_lines_per_sec": 15023.6,
+      "total_extracted_candidates": 1
+    },
+    "50": {
+      "avg_latency_ms": 3.028,
+      "std_latency_ms": 0.227,
+      "throughput_lines_per_sec": 16510.5,
+      "total_extracted_candidates": 5
+    },
+    "100": {
+      "avg_latency_ms": 5.646,
+      "std_latency_ms": 0.09,
+      "throughput_lines_per_sec": 17712.5,
+      "total_extracted_candidates": 6
+    },
+    "250": {
+      "avg_latency_ms": 14.517,
+      "std_latency_ms": 0.381,
+      "throughput_lines_per_sec": 17221.2,
+      "total_extracted_candidates": 17
+    },
+    "500": {
+      "avg_latency_ms": 29.048,
+      "std_latency_ms": 0.453,
+      "throughput_lines_per_sec": 17212.7,
+      "total_extracted_candidates": 30
+    },
+    "1000": {
+      "avg_latency_ms": 58.199,
+      "std_latency_ms": 0.744,
+      "throughput_lines_per_sec": 17182.3,
+      "total_extracted_candidates": 60
+    }
+  },
+  "routing_evaluation": [
+    {
+      "context": "client = boto3.client(\"s3\", aw",
+      "rule_id": "SG-AWS-001",
+      "regex_uncertainty": 0.0,
+      "entropy_normalized": 0.14,
+      "context_ambiguity": 0.2,
+      "ambiguity_score": 0.102,
+      "route": "Local Deterministic (0ms)"
+    },
+    {
+      "context": "token = \"ghp_1234567890abcdefg",
+      "rule_id": "SG-GH-001",
+      "regex_uncertainty": 0.0,
+      "entropy_normalized": 0.368,
+      "context_ambiguity": 0.8,
+      "ambiguity_score": 0.3504,
+      "route": "Profile A (llama-3.1-8b-instant)"
+    },
+    {
+      "context": "custom_auth_token = \"x9aK81mZb",
+      "rule_id": "SG-HEUR-001",
+      "regex_uncertainty": 1.0,
+      "entropy_normalized": 0.26,
+      "context_ambiguity": 0.2,
+      "ambiguity_score": 0.538,
+      "route": "Profile A (llama-3.1-8b-instant)"
+    },
+    {
+      "context": "mock_aws_key = \"AKIAIOSFODNN7E",
+      "rule_id": "SG-AWS-001",
+      "regex_uncertainty": 0.0,
+      "entropy_normalized": 0.14,
+      "context_ambiguity": 1.0,
+      "ambiguity_score": 0.342,
+      "route": "Profile A (llama-3.1-8b-instant)"
+    },
+    {
+      "context": "fake_token = \"secret_test_mock",
+      "rule_id": "SG-HEUR-001",
+      "regex_uncertainty": 1.0,
+      "entropy_normalized": 0.18,
+      "context_ambiguity": 1.0,
+      "ambiguity_score": 0.754,
+      "route": "Profile B (openai/gpt-4o-mini)"
+    }
+  ]
+}
