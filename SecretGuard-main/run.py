@@ -61,9 +61,10 @@ def main() -> None:
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONPATH"] = str(workspace) + os.pathsep + env.get("PYTHONPATH", "")
     cmd = [str(venv_py), "-m", "secretguard.cli", *sys.argv[1:]]
     try:
-        proc = subprocess.run(cmd, cwd=workspace, env=env)
+        proc = subprocess.run(cmd, env=env)
         sys.exit(proc.returncode)
     except KeyboardInterrupt:
         sys.exit(130)

@@ -27,7 +27,7 @@ def main() -> None:
         try:
             proc = subprocess.run(
                 [sys.executable, str(nested_script), *forwarded_args],
-                cwd=workspace / "SecretGuard-main",
+                cwd=Path.cwd(),
                 env=env,
             )
             sys.exit(proc.returncode)

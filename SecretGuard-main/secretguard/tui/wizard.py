@@ -31,15 +31,23 @@ from secretguard.tui.theme import (
 
 DEFAULT_CONFIG_PATH = Path.home() / ".config" / "secretguard" / "config.yaml"
 
-PRE_COMMIT_SCRIPT_TEMPLATE = """#!/usr/bin/env bash
+PRE_COMMIT_SCRIPT_TEMPLATE = """#!/usr/bin/env sh
 # SecretGuard automated pre-commit hook
 set -e
 if command -v secretguard >/dev/null 2>&1; then
     exec secretguard scan --pre-commit
+elif [ -f SecretGuard-main/.venv/Scripts/secretguard.exe ]; then
+    exec SecretGuard-main/.venv/Scripts/secretguard.exe scan --pre-commit
+elif [ -f .venv/Scripts/secretguard.exe ]; then
+    exec .venv/Scripts/secretguard.exe scan --pre-commit
+elif [ -f SecretGuard-main/.venv/bin/secretguard ]; then
+    exec SecretGuard-main/.venv/bin/secretguard scan --pre-commit
 elif [ -f .venv/bin/secretguard ]; then
     exec .venv/bin/secretguard scan --pre-commit
+elif command -v python >/dev/null 2>&1; then
+    exec python run.py scan --pre-commit
 else
-    python3 -m secretguard.cli scan --pre-commit
+    exec python3 run.py scan --pre-commit
 fi
 """
 
@@ -162,6 +170,13 @@ def run_autopilot_wizard(
     # 4. Install pre-commit hook if approved
     hook_installed = False
     repo_dir = Path(repo_path).resolve()
+    if not (repo_dir / ".git").is_dir():
+        curr = repo_dir
+        while curr.parent != curr:
+            if (curr / ".git").is_dir():
+                repo_dir = curr
+                break
+            curr = curr.parent
     git_hooks_dir = repo_dir / ".git" / "hooks"
     if ans1 and git_hooks_dir.is_dir():
         hook_file = git_hooks_dir / "pre-commit"

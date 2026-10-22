@@ -6,8 +6,8 @@ set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 chcp 65001 >nul 2>&1
 
-if exist "%ROOT_DIR%SecretGuard-main\run.bat" (
-    call "%ROOT_DIR%SecretGuard-main\run.bat" %*
+if exist "%ROOT_DIR%SecretGuard-main\.venv\Scripts\secretguard.exe" (
+    "%ROOT_DIR%SecretGuard-main\.venv\Scripts\secretguard.exe" %*
     exit /b %ERRORLEVEL%
 )
 
