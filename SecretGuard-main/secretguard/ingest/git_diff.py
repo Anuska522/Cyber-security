@@ -36,6 +36,8 @@ class GitDiffParser(IDiffIngester):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         return result.stdout
 
