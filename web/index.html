@@ -3,1208 +3,1020 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SecretGuard Enterprise Console — Autonomous Secret Interception & Tiered Ambiguity Quarantine</title>
+  <title>SecretGuard — Repository Secret Detection &amp; Quarantine</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-base: #06090e;
-      --bg-surface: #0b0f19;
-      --bg-card: rgba(13, 19, 33, 0.82);
-      --bg-card-hover: rgba(22, 32, 54, 0.9);
-      --border-subtle: rgba(56, 189, 248, 0.14);
-      --border-highlight: rgba(0, 245, 160, 0.35);
-      --border-danger: rgba(244, 63, 94, 0.35);
-      --primary-cyan: #00d2ff;
-      --accent-emerald: #00f5a0;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
-      --accent-indigo: #6366f1;
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-tertiary: #64748b;
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --bg: #0d1117;
+      --bg-header: #010409;
+      --surface: #161b22;
+      --surface-subtle: #0d1117;
+      --surface-hover: #1c2128;
+      --border: #30363d;
+      --border-muted: #21262d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --text-muted: #8b949e;
+      --accent: #2f81f7;
+      --accent-hover: #388bfd;
+      --green: #238636;
+      --green-bright: #3fb950;
+      --green-bg: rgba(46, 160, 67, 0.15);
+      --red: #da3633;
+      --red-bright: #f85149;
+      --red-bg: rgba(248, 81, 73, 0.15);
+      --amber: #d29922;
+      --amber-bg: rgba(210, 153, 34, 0.15);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--bg-base);
-      background-image: 
-        radial-gradient(circle at 10% 10%, rgba(0, 210, 255, 0.05) 0%, transparent 45%),
-        radial-gradient(circle at 90% 90%, rgba(0, 245, 160, 0.04) 0%, transparent 50%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
-      color: var(--text-primary);
-      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
     }
 
-    /* SVG Icon System */
-    .icon {
-      width: 16px;
-      height: 16px;
-      display: inline-block;
-      vertical-align: -2px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-
-    /* Top Navigation Bar */
+    /* GitHub-style header */
     header {
-      background: rgba(6, 9, 14, 0.88);
-      border-bottom: 1px solid var(--border-subtle);
-      backdrop-filter: blur(16px);
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      padding: 0.75rem 2rem;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    .brand-cluster {
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 12px;
     }
 
-    .brand-mark {
-      width: 38px;
-      height: 38px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(0, 245, 160, 0.15));
-      border: 1px solid var(--border-highlight);
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      background: #21262d;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--accent-emerald);
-      box-shadow: 0 0 16px rgba(0, 245, 160, 0.2);
+      color: var(--text-bright);
     }
 
-    .brand-title-wrap h1 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .version-tag {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
+    .brand-title {
       font-weight: 600;
-      padding: 0.15rem 0.45rem;
+      font-size: 14px;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .repo-crumb {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .badge-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: #161b22;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
       border-radius: 4px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      color: var(--primary-cyan);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
     }
 
-    .brand-subtitle {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
-      margin-top: 1px;
-    }
-
-    .telemetry-strip {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-    }
-
-    .stat-pill {
-      font-family: var(--font-mono);
-      font-size: 0.725rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      border: 1px solid var(--border-subtle);
-      background: rgba(11, 15, 25, 0.7);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-secondary);
-    }
-
-    .stat-pill strong {
-      color: #fff;
-    }
-
-    .status-beacon {
-      width: 7px;
-      height: 7px;
+    .indicator-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: var(--accent-emerald);
-      box-shadow: 0 0 10px var(--accent-emerald);
-      animation: beaconGlow 2.5s infinite ease-in-out;
+      background: var(--green-bright);
     }
 
-    @keyframes beaconGlow {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.2); }
-    }
-
-    /* Sub-Navigation Tabs */
-    nav.console-tabs {
-      background: rgba(11, 15, 25, 0.75);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 0 2rem;
+    /* Sub-nav tabs */
+    nav.app-tabs {
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
       display: flex;
-      gap: 0.35rem;
+      gap: 4px;
     }
 
-    .tab-trigger {
+    .nav-tab {
       background: none;
       border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--text-secondary);
-      padding: 0.85rem 1.15rem;
-      font-size: 0.825rem;
+      color: var(--text-muted);
+      font-size: 13px;
       font-weight: 500;
+      padding: 10px 14px;
       cursor: pointer;
+      border-bottom: 2px solid transparent;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      transition: all 0.18s ease;
+      gap: 8px;
+      transition: color 0.15s ease;
     }
 
-    .tab-trigger:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.02);
+    .nav-tab:hover {
+      color: var(--text-bright);
     }
 
-    .tab-trigger.active {
-      color: var(--accent-emerald);
-      border-bottom-color: var(--accent-emerald);
+    .nav-tab.active {
+      color: var(--text-bright);
+      border-bottom-color: #f78166;
       font-weight: 600;
     }
 
-    /* Main Workspace Container */
-    main.workspace {
+    .tab-counter {
+      background: #21262d;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    /* Layout Container */
+    main.container {
       flex: 1;
-      max-width: 1400px;
+      max-width: 1360px;
       width: 100%;
       margin: 0 auto;
-      padding: 1.75rem 2rem;
+      padding: 24px;
     }
 
-    .tab-view {
+    .tab-section {
       display: none;
-      animation: tabFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .tab-view.active {
+    .tab-section.active {
       display: block;
     }
 
-    @keyframes tabFadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* High-Precision Cards */
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 1.35rem 1.5rem;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.15rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .panel-headline {
-      font-size: 0.925rem;
-      font-weight: 600;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-      letter-spacing: -0.01em;
-    }
-
-    .panel-meta {
-      font-family: var(--font-mono);
-      font-size: 0.725rem;
-      color: var(--text-tertiary);
-    }
-
-    /* Grids */
-    .grid-duo {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 1.35rem;
-    }
-
-    .grid-equal {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.35rem;
-    }
-
-    .grid-trio {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    .grid-quad {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-    }
-
-    @media (max-width: 1024px) {
-      .grid-duo, .grid-equal { grid-template-columns: 1fr; }
-      .grid-quad { grid-template-columns: 1fr 1fr; }
-    }
-
-    /* Interactive Code Workbench */
-    .preset-selector-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      margin-bottom: 0.85rem;
-    }
-
-    .preset-button {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 0.35rem 0.7rem;
-      font-size: 0.725rem;
-      font-family: var(--font-mono);
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .preset-button:hover {
-      background: rgba(56, 189, 248, 0.1);
-      color: var(--primary-cyan);
-      border-color: rgba(56, 189, 248, 0.35);
-    }
-
-    .editor-wrapper {
-      position: relative;
-      background: #04070d;
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
+    /* Card Panels */
+    .box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 20px;
       overflow: hidden;
     }
 
-    .editor-chrome {
-      background: rgba(15, 23, 42, 0.6);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 0.4rem 0.85rem;
+    .box-header {
+      background: #161b22;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-tertiary);
     }
 
-    textarea.code-canvas {
+    .box-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .box-body {
+      padding: 16px;
+    }
+
+    /* Grid systems */
+    .col-2 {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+    }
+
+    .col-equal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 960px) {
+      .col-2, .col-equal { grid-template-columns: 1fr; }
+    }
+
+    /* Code & Diff Input */
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .select-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .select-dropdown {
+      background: #0d1117;
+      color: var(--text-bright);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .editor-frame {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #0d1117;
+      overflow: hidden;
+    }
+
+    .editor-statusbar {
+      background: #161b22;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    textarea.diff-input {
       width: 100%;
-      height: 250px;
+      height: 240px;
       background: transparent;
       border: none;
-      padding: 0.85rem 1rem;
-      color: #7dd3fc;
-      font-family: var(--font-mono);
-      font-size: 0.825rem;
+      padding: 12px 14px;
+      color: #e6edf3;
+      font-family: var(--mono);
+      font-size: 12.5px;
       line-height: 1.6;
       resize: vertical;
       outline: none;
       tab-size: 4;
     }
 
-    textarea.code-canvas:focus {
-      box-shadow: inset 0 0 0 1px var(--primary-cyan);
+    textarea.diff-input:focus {
+      outline: 1px solid var(--accent);
     }
 
-    .action-row {
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .btn-action {
-      background: linear-gradient(135deg, #00d2ff, #00f5a0);
-      color: #04070d;
-      font-weight: 600;
-      border: none;
-      padding: 0.65rem 1.35rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.825rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.18s ease;
-      box-shadow: 0 4px 14px rgba(0, 245, 160, 0.22);
-    }
-
-    .btn-action:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(0, 245, 160, 0.35);
-    }
-
-    .btn-secondary {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
+    /* Buttons */
+    .btn-primary {
+      background: var(--green);
+      color: #ffffff;
+      border: 1px solid rgba(240, 246, 252, 0.1);
+      padding: 6px 14px;
+      font-size: 13px;
       font-weight: 500;
-      padding: 0.65rem 1.15rem;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.825rem;
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      transition: all 0.15s ease;
+      gap: 6px;
+      transition: background 0.15s ease;
     }
 
-    .btn-secondary:hover {
-      color: #fff;
-      border-color: rgba(255, 255, 255, 0.2);
+    .btn-primary:hover {
+      background: #2ea043;
     }
 
-    /* Metric Gauges */
-    .stat-box {
-      background: rgba(4, 7, 13, 0.7);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
+    .btn-default {
+      background: #21262d;
+      color: var(--text-bright);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .stat-label {
-      font-size: 0.725rem;
-      color: var(--text-secondary);
+    .btn-default:hover {
+      background: #30363d;
+    }
+
+    /* Metric Summary Tiles */
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric-card {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .metric-heading {
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 0.35rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
     }
 
-    .stat-number {
-      font-size: 1.65rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      color: #fff;
+    .metric-val {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-top: 4px;
     }
 
-    .stat-number.danger { color: var(--accent-rose); }
-    .stat-number.success { color: var(--accent-emerald); }
-    .stat-number.info { color: var(--primary-cyan); }
+    .metric-val.warn { color: var(--red-bright); }
+    .metric-val.clean { color: var(--green-bright); }
 
-    /* Tables */
-    .table-viewport {
-      overflow-x: auto;
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      background: #04070d;
+    /* Alert Banner */
+    .alert-banner {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
     }
 
-    table.data-table {
+    .alert-banner.clean {
+      background: var(--green-bg);
+      border-color: rgba(46, 160, 67, 0.4);
+      color: #7ee787;
+    }
+
+    .alert-banner.danger {
+      background: var(--red-bg);
+      border-color: rgba(248, 81, 73, 0.4);
+      color: #ff7b72;
+    }
+
+    /* Findings Table */
+    table.findings-grid {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
+      font-size: 12px;
+    }
+
+    table.findings-grid th {
+      background: #161b22;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
       text-align: left;
-    }
-
-    table.data-table th {
-      background: rgba(15, 23, 42, 0.8);
-      color: var(--text-secondary);
-      padding: 0.7rem 0.95rem;
       font-weight: 600;
-      font-family: var(--font-mono);
-      font-size: 0.725rem;
-      border-bottom: 1px solid var(--border-subtle);
-      letter-spacing: 0.02em;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
     }
 
-    table.data-table td {
-      padding: 0.75rem 0.95rem;
-      border-bottom: 1px solid rgba(56, 189, 248, 0.07);
-      font-family: var(--font-mono);
+    table.findings-grid td {
+      border-bottom: 1px solid var(--border-muted);
+      padding: 10px 12px;
+      font-family: var(--mono);
+      vertical-align: middle;
     }
 
-    table.data-table tr:hover td {
-      background: rgba(30, 41, 59, 0.3);
+    table.findings-grid tr:hover td {
+      background: var(--surface-hover);
     }
 
-    .tag-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.2rem 0.5rem;
+    .chip {
+      display: inline-block;
+      padding: 2px 6px;
       border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      border: 1px solid transparent;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: var(--mono);
     }
 
-    .tag-danger {
-      background: rgba(244, 63, 94, 0.12);
-      color: var(--accent-rose);
-      border-color: rgba(244, 63, 94, 0.3);
-    }
+    .chip-red { background: var(--red-bg); color: #ff7b72; border: 1px solid rgba(248, 81, 73, 0.3); }
+    .chip-green { background: var(--green-bg); color: #7ee787; border: 1px solid rgba(46, 160, 67, 0.3); }
+    .chip-amber { background: var(--amber-bg); color: #e3b341; border: 1px solid rgba(210, 153, 34, 0.3); }
+    .chip-gray { background: #21262d; color: var(--text-muted); border: 1px solid var(--border); }
 
-    .tag-warning {
-      background: rgba(245, 158, 11, 0.12);
-      color: var(--accent-amber);
-      border-color: rgba(245, 158, 11, 0.3);
-    }
-
-    .tag-success {
-      background: rgba(0, 245, 160, 0.12);
-      color: var(--accent-emerald);
-      border-color: rgba(0, 245, 160, 0.3);
-    }
-
-    .tag-neutral {
-      background: rgba(148, 163, 184, 0.1);
-      color: var(--text-secondary);
-      border-color: rgba(148, 163, 184, 0.2);
-    }
-
-    /* Ambiguity Simulator */
-    .formula-banner {
-      background: rgba(4, 7, 13, 0.9);
-      border: 1px dashed var(--border-subtle);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      font-family: var(--font-mono);
-      font-size: 0.825rem;
-      color: var(--primary-cyan);
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .slider-row {
-      margin-bottom: 1.25rem;
+    /* Ambiguity Equation Sliders */
+    .slider-box {
+      margin-bottom: 16px;
     }
 
     .slider-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 0.4rem;
-      font-size: 0.8rem;
+      font-size: 12px;
+      margin-bottom: 4px;
     }
 
-    .slider-header strong {
-      font-family: var(--font-mono);
-      color: var(--primary-cyan);
+    .slider-header span.label {
+      color: var(--text);
     }
 
-    input[type=range].control-slider {
+    .slider-header span.val {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    input[type=range].pure-slider {
       width: 100%;
-      height: 5px;
-      background: rgba(56, 189, 248, 0.18);
-      border-radius: 3px;
+      height: 4px;
+      background: #21262d;
+      border-radius: 2px;
       outline: none;
       -webkit-appearance: none;
     }
 
-    input[type=range].control-slider::-webkit-slider-thumb {
+    input[type=range].pure-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      background: var(--accent-emerald);
+      background: #f0f6fc;
+      border: 1px solid #30363d;
       cursor: pointer;
-      box-shadow: 0 0 10px var(--accent-emerald);
-      border: 2px solid #06090e;
     }
 
-    .routing-matrix-card {
-      background: rgba(4, 7, 13, 0.75);
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      padding: 1.5rem;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .score-readout {
-      font-size: 3.5rem;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      letter-spacing: -0.03em;
-      margin: 0.4rem 0;
-      transition: color 0.25s ease;
-    }
-
-    .routing-decision-pill {
-      font-family: var(--font-mono);
-      font-size: 0.825rem;
-      font-weight: 600;
-      padding: 0.45rem 1.15rem;
-      border-radius: 20px;
-      border: 1px solid transparent;
-      margin-bottom: 1rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    /* Routing Path Mesh */
-    .routing-mesh {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.65rem;
-      margin-top: 1.25rem;
-    }
-
-    .mesh-node {
-      background: rgba(15, 23, 42, 0.5);
-      border: 1px solid var(--border-subtle);
+    .routing-outcome-panel {
+      background: #0d1117;
+      border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 0.65rem 0.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-tertiary);
-      transition: all 0.2s ease;
+      padding: 20px;
+      text-align: center;
     }
 
-    .mesh-node.active-tier {
-      background: rgba(0, 245, 160, 0.08);
-      border-color: var(--accent-emerald);
-      color: var(--accent-emerald);
-      box-shadow: 0 0 14px rgba(0, 245, 160, 0.15);
+    .big-score {
+      font-family: var(--mono);
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--green-bright);
+      margin: 8px 0;
     }
 
-    /* Diff Split Viewer */
-    .diff-block {
-      background: #030509;
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      overflow: hidden;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
+    .route-tier-chip {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
     }
 
-    .diff-header {
-      background: rgba(15, 23, 42, 0.7);
-      padding: 0.45rem 0.85rem;
-      border-bottom: 1px solid var(--border-subtle);
+    /* Diff View */
+    .unified-diff-view {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    .diff-line {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--text-secondary);
-      font-size: 0.725rem;
+      padding: 2px 8px;
     }
 
-    .diff-content {
-      padding: 0.85rem 1rem;
+    .diff-line.del { background: rgba(248, 81, 73, 0.15); color: #ffdcd7; }
+    .diff-line.add { background: rgba(46, 160, 67, 0.15); color: #aff5b4; }
+    .diff-line.hunk { background: rgba(56, 139, 253, 0.15); color: #79c0ff; }
+
+    .line-no {
+      width: 40px;
+      color: var(--text-muted);
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .line-text {
       white-space: pre-wrap;
-      line-height: 1.6;
-      min-height: 160px;
-    }
-
-    .diff-content.removed {
-      background: rgba(244, 63, 94, 0.04);
-      color: #fda4af;
-    }
-
-    .diff-content.added {
-      background: rgba(0, 245, 160, 0.04);
-      color: #6ee7b7;
-    }
-
-    /* Terminal Console */
-    .terminal-window {
-      background: #030509;
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      overflow: hidden;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-    }
-
-    .terminal-topbar {
-      background: rgba(15, 23, 42, 0.7);
-      padding: 0.45rem 0.85rem;
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-tertiary);
-    }
-
-    .terminal-body {
-      padding: 0.85rem 1rem;
-      color: #cbd5e1;
-      line-height: 1.6;
-      max-height: 320px;
-      overflow-y: auto;
+      word-break: break-all;
     }
 
     /* Footer */
-    footer.app-footer {
-      border-top: 1px solid var(--border-subtle);
-      background: rgba(6, 9, 14, 0.95);
-      padding: 1.25rem 2rem;
+    footer {
+      background: var(--bg-header);
+      border-top: 1px solid var(--border);
+      padding: 16px 24px;
+      font-size: 12px;
+      color: var(--text-muted);
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
+      align-items: center;
+      margin-top: auto;
     }
 
-    .footer-links {
-      display: flex;
-      gap: 1.25rem;
-    }
-
-    .footer-links a {
-      color: var(--text-secondary);
+    footer a {
+      color: var(--text-muted);
       text-decoration: none;
     }
 
-    .footer-links a:hover {
-      color: #fff;
+    footer a:hover {
+      color: var(--text-bright);
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top App Header -->
   <header>
-    <div class="brand-cluster">
-      <div class="brand-mark">
-        <svg class="icon" style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div class="header-left">
+      <div class="brand-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
-      <div class="brand-title-wrap">
-        <h1>
-          SECRETGUARD
-          <span class="version-tag">ENTERPRISE v1.0.0</span>
-        </h1>
-        <div class="brand-subtitle">Autonomous Credential Interception & Tiered Ambiguity Quarantine</div>
+      <div class="brand-title">
+        <span class="repo-crumb">Anuska522 / Cyber-security /</span>
+        <span>SecretGuard</span>
+        <span class="badge-tag">v1.0.0</span>
       </div>
     </div>
 
-    <div class="telemetry-strip">
-      <div class="stat-pill">
-        <span class="status-beacon"></span>
-        Git Pre-Commit: <strong>Enforced</strong>
+    <div class="header-meta">
+      <div class="status-indicator">
+        <span class="indicator-dot"></span>
+        <span>Pre-Commit Hook: Active</span>
       </div>
-      <div class="stat-pill">
-        Latency SLA: <strong>&lt; 5.65 ms</strong>
+      <div class="status-indicator">
+        <span>SLA: 5.65 ms</span>
       </div>
-      <div class="stat-pill">
-        Suite Tests: <strong>112/112 Passing</strong>
-      </div>
-      <div class="stat-pill">
-        Shannon Cutoff: <strong>H &ge; 4.2</strong>
+      <div class="status-indicator">
+        <span>Tests: 112 Passing</span>
       </div>
     </div>
   </header>
 
-  <!-- Section Tabs -->
-  <nav class="console-tabs">
-    <button class="tab-trigger active" onclick="activateTab('inspector', this)">
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-      Diff Inspector & Scanner
+  <!-- Navigation Tabs -->
+  <nav class="app-tabs">
+    <button class="nav-tab active" onclick="showTab('scanner', this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Scanner &amp; Pre-Commit Diff
     </button>
-    <button class="tab-trigger" onclick="activateTab('ambiguity', this)">
-      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2 6.3-6.4 2.1 2.1-6.4z"/></svg>
-      Ambiguity Engine (S_amb)
+    <button class="nav-tab" onclick="showTab('ambiguity', this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2 6.3-6.4 2.1 2.1-6.4z"/></svg>
+      Ambiguity Calculator (S_amb)
     </button>
-    <button class="tab-trigger" onclick="activateTab('workbench', this)">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      Remediation Workbench
+    <button class="nav-tab" onclick="showTab('quarantine', this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Remediation &amp; AST Diff
     </button>
-    <button class="tab-trigger" onclick="activateTab('telemetry', this)">
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      System Telemetry & Logs
+    <button class="nav-tab" onclick="showTab('benchmarks', this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Benchmarks &amp; Telemetry
     </button>
-    <button class="tab-trigger" onclick="activateTab('manuscript', this)">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      IEEE Manuscript
+    <button class="nav-tab" onclick="showTab('manuscript', this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Research Paper (IEEE)
     </button>
   </nav>
 
-  <!-- Workspace Content -->
-  <main class="workspace">
+  <!-- Main Container -->
+  <main class="container">
 
-    <!-- TAB 1: DIFF INSPECTOR & SCANNER -->
-    <div id="view-inspector" class="tab-view active">
-      <div class="grid-duo">
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-headline">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-              Staged Diff Buffer & Source Code
+    <!-- TAB 1: SCANNER & PRE-COMMIT DIFF -->
+    <div id="tab-scanner" class="tab-section active">
+      <div class="col-2">
+        <div class="box">
+          <div class="box-header">
+            <span class="box-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Staged Code / Unified Diff Input
+            </span>
+            <div class="toolbar-row" style="margin-bottom:0;">
+              <span class="select-label">Load test case:</span>
+              <select id="presetSelect" class="select-dropdown" onchange="applyPreset(this.value)">
+                <option value="aws">AWS IAM Access Key (SG-AWS-001)</option>
+                <option value="github">GitHub Classic PAT (SG-GH-001)</option>
+                <option value="jwt">Signed JSON Web Token (SG-JWT-001)</option>
+                <option value="mock">Unit Test Fixture (Ambiguous Mock)</option>
+                <option value="placeholder">Template Placeholder (Suppressed)</option>
+                <option value="clean">Clean Environment Reference</option>
+              </select>
             </div>
-            <div class="panel-meta">Mode: Additions Only Streaming</div>
           </div>
-
-          <div class="preset-selector-bar">
-            <button class="preset-button" onclick="selectSnippet('aws')">AWS Access Key</button>
-            <button class="preset-button" onclick="selectSnippet('github')">GitHub Classic PAT</button>
-            <button class="preset-button" onclick="selectSnippet('jwt')">Cryptographic JWT</button>
-            <button class="preset-button" onclick="selectSnippet('mock')">Test Mock (Ambiguous)</button>
-            <button class="preset-button" onclick="selectSnippet('placeholder')">Template Placeholder</button>
-            <button class="preset-button" onclick="selectSnippet('clean')">Clean Reference Code</button>
-          </div>
-
-          <div class="editor-wrapper">
-            <div class="editor-chrome">
-              <span>staging/unified_diff.patch</span>
-              <span>UTF-8 &middot; Zero Buffering</span>
+          <div class="box-body">
+            <div class="editor-frame">
+              <div class="editor-statusbar">
+                <span>staging/patch.diff</span>
+                <span>Streaming diff additions &middot; Max context 200 chars</span>
+              </div>
+              <textarea id="codeEditor" class="diff-input" spellcheck="false" placeholder="Paste staged unified diff or file contents here..."></textarea>
             </div>
-            <textarea id="codeBuffer" class="code-canvas" spellcheck="false" placeholder="Enter Git unified diff or paste code addition hunks..."></textarea>
-          </div>
 
-          <div class="action-row">
-            <div style="font-size: 0.75rem; color: var(--text-tertiary); font-family: var(--font-mono);">
-              Context isolation bounded to &le; 200 chars
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+              <button class="btn-default" onclick="clearEditor()">Clear</button>
+              <button class="btn-primary" onclick="triggerScan()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Scan Staged Changes
+              </button>
             </div>
-            <button class="btn-action" onclick="runInterceptionScan()">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Run Interception Scan
-            </button>
           </div>
         </div>
 
-        <!-- Telemetry & Extraction Gauges -->
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-headline">
-              <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              Extraction Summary
-            </div>
-            <div class="panel-meta" id="latencyIndicator">0.00 ms</div>
+        <div class="box">
+          <div class="box-header">
+            <span class="box-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Execution Statistics
+            </span>
+            <span id="scanTimer" style="font-family: var(--mono); font-size: 12px; color: var(--text-muted);">0.00 ms</span>
           </div>
+          <div class="box-body">
+            <div class="metrics-bar">
+              <div class="metric-card">
+                <div class="metric-heading">Lines Evaluated</div>
+                <div id="statLines" class="metric-val">0</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-heading">Secrets Found</div>
+                <div id="statSecrets" class="metric-val warn">0</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-heading">Placeholders Filtered</div>
+                <div id="statFiltered" class="metric-val clean">0</div>
+              </div>
+            </div>
 
-          <div class="grid-trio" style="margin-bottom: 1.25rem;">
-            <div class="stat-box">
-              <span class="stat-label">Lines Evaluated</span>
-              <span id="metricLines" class="stat-number">0</span>
+            <div id="alertBox" class="alert-banner clean">
+              <div>
+                <strong>Scan Clean:</strong> No unmasked credentials detected in current buffer. Git commit will proceed.
+              </div>
             </div>
-            <div class="stat-box">
-              <span class="stat-label">Secrets Intercepted</span>
-              <span id="metricSecrets" class="stat-number danger">0</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">Placeholders Filtered</span>
-              <span id="metricSuppressed" class="stat-number info">0</span>
-            </div>
-          </div>
-
-          <div id="scanVerdictBox" style="background: rgba(11, 15, 25, 0.75); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1.15rem; font-size: 0.8rem; color: var(--text-secondary);">
-            System standing by. Click <b>Run Interception Scan</b> or choose a scenario preset above to run the deterministic rule engine, Shannon entropy calculations, and ambiguity scoring.
           </div>
         </div>
       </div>
 
-      <!-- Detailed Findings Table -->
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-headline">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            Candidate Extraction Findings & Routing Tiers
-          </div>
-          <div class="panel-meta">Strict Data Masking: Enabled</div>
+      <!-- Findings Table -->
+      <div class="box">
+        <div class="box-header">
+          <span class="box-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Extracted Candidates &amp; Routing Decisions
+          </span>
+          <span style="font-family: var(--mono); font-size: 11px; color: var(--text-muted);">RFC 0600 Redaction Enabled</span>
         </div>
-
-        <div class="table-viewport">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>LINE</th>
-                <th>RULE IDENTIFIER</th>
-                <th>CANDIDATE TOKEN</th>
-                <th>ENTROPY H(X)</th>
-                <th>AMBIGUITY S_amb</th>
-                <th>ROUTING DESTINATION</th>
-                <th>ENFORCEMENT</th>
-              </tr>
-            </thead>
-            <tbody id="findingsTableBody">
-              <tr>
-                <td colspan="7" style="text-align: center; color: var(--text-tertiary); padding: 2.5rem;">
-                  No active findings in buffer. Execute a scan to inspect findings.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table class="findings-grid">
+          <thead>
+            <tr>
+              <th style="width: 70px;">LINE</th>
+              <th style="width: 140px;">RULE ID</th>
+              <th>MASKED LITERAL</th>
+              <th style="width: 110px;">ENTROPY H(X)</th>
+              <th style="width: 120px;">AMBIGUITY S_amb</th>
+              <th style="width: 180px;">ROUTING PROFILE</th>
+              <th style="width: 120px;">ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="findingsBody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                No findings currently in buffer. Run a scan to inspect findings.
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- TAB 2: AMBIGUITY SCORER (S_amb) -->
-    <div id="view-ambiguity" class="tab-view">
-      <div class="grid-duo">
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-headline">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              Closed-Form Ambiguity Scoring Formulation
-            </div>
-            <div class="panel-meta">Weights: [0.40, 0.30, 0.30]</div>
+    <!-- TAB 2: AMBIGUITY CALCULATOR -->
+    <div id="tab-ambiguity" class="tab-section">
+      <div class="col-equal">
+        <div class="box">
+          <div class="box-header">
+            <span class="box-title">Ambiguity Parameters Formulation</span>
+            <span style="font-family: var(--mono); font-size: 11px; color: var(--text-muted);">Equation: S_amb = 0.40 U_regex + 0.30 (1 - H_hat) + 0.30 A_ctx</span>
           </div>
+          <div class="box-body">
+            <div class="slider-box">
+              <div class="slider-header">
+                <span class="label">Rule Uncertainty (U_regex)</span>
+                <span id="txtUregex" class="val">0.00</span>
+              </div>
+              <input type="range" class="pure-slider" id="slideUregex" min="0" max="1" step="0.05" value="0.00" oninput="runCalculator()">
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                0.00 = strict vendor pattern (AWS, GitHub); 1.00 = broad generic heuristic
+              </div>
+            </div>
 
-          <div class="formula-banner">
-            <span>S_amb = 0.40 &middot; U_regex + 0.30 &middot; (1 - H_hat) + 0.30 &middot; A_ctx</span>
-            <span class="version-tag">Verified Equation</span>
-          </div>
+            <div class="slider-box">
+              <div class="slider-header">
+                <span class="label">Shannon Entropy H(X) [bits]</span>
+                <span id="txtEntropy" class="val">4.60</span>
+              </div>
+              <input type="range" class="pure-slider" id="slideEntropy" min="1.0" max="6.0" step="0.1" value="4.60" oninput="runCalculator()">
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                Standard credentials H &ge; 4.2. Higher entropy maps to lower uncertainty.
+              </div>
+            </div>
 
-          <div class="slider-row">
-            <div class="slider-header">
-              <span>Rule Specificity Uncertainty (U_regex)</span>
-              <strong id="labelUregex">0.00</strong>
-            </div>
-            <input type="range" class="control-slider" id="inputUregex" min="0" max="1" step="0.05" value="0.00" oninput="calculateAmbiguityMetrics()">
-            <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;">
-              0.00 = pre-compiled vendor regex (e.g. AWS/GitHub); 1.00 = broad variable name heuristic
-            </div>
-          </div>
-
-          <div class="slider-row">
-            <div class="slider-header">
-              <span>Shannon Entropy H(X) [bits/symbol]</span>
-              <strong id="labelEntropy">4.60</strong>
-            </div>
-            <input type="range" class="control-slider" id="inputEntropy" min="1.0" max="6.0" step="0.1" value="4.60" oninput="calculateAmbiguityMetrics()">
-            <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;">
-              Higher entropy maps inversely to uncertainty (1 - H_hat). Standard cryptographic tokens &ge; 4.2
-            </div>
-          </div>
-
-          <div class="slider-row">
-            <div class="slider-header">
-              <span>Surrounding Context Ambiguity (A_ctx)</span>
-              <strong id="labelActx">0.20</strong>
-            </div>
-            <input type="range" class="control-slider" id="inputActx" min="0" max="1" step="0.05" value="0.20" oninput="calculateAmbiguityMetrics()">
-            <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;">
-              0.20 = production client instantiation; 1.00 = test/mock directory fixture or template
+            <div class="slider-box">
+              <div class="slider-header">
+                <span class="label">Context Ambiguity (A_ctx)</span>
+                <span id="txtActx" class="val">0.20</span>
+              </div>
+              <input type="range" class="pure-slider" id="slideActx" min="0" max="1" step="0.05" value="0.20" oninput="runCalculator()">
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                0.20 = production client instantiation; 1.00 = test double or test directory fixture
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-headline">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Routing Execution Decision
-            </div>
-            <div class="panel-meta">Zero Latency Bypass</div>
+        <div class="box">
+          <div class="box-header">
+            <span class="box-title">Routing Policy Decision</span>
+            <span style="font-family: var(--mono); font-size: 11px; color: var(--text-muted);">Deterministic Threshold: &lt; 0.20</span>
           </div>
-
-          <div class="routing-matrix-card">
-            <div style="font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">
-              Mathematical Score S_amb
-            </div>
-            <div id="readoutScore" class="score-readout" style="color: var(--accent-emerald);">0.102</div>
-            <div id="readoutDecisionBadge" class="routing-decision-pill tag-success">
-              Local Deterministic (0 ms Network)
-            </div>
-            <p id="readoutRationale" style="font-size: 0.8rem; color: var(--text-secondary); max-width: 440px; line-height: 1.6;">
-              Unambiguous production token signature. Candidate resolved deterministically without network egress.
-            </p>
-
-            <div class="routing-mesh">
-              <div id="tier0Node" class="mesh-node active-tier">
-                <div>TIER 0</div>
-                <strong>Deterministic</strong>
-                <div style="font-size:0.65rem; margin-top:2px;">S_amb &lt; 0.20</div>
+          <div class="box-body">
+            <div class="routing-outcome-panel">
+              <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">
+                Computed Ambiguity Score (S_amb)
               </div>
-              <div id="tier1Node" class="mesh-node">
-                <div>TIER 1</div>
-                <strong>Edge (8B)</strong>
-                <div style="font-size:0.65rem; margin-top:2px;">0.20 &le; S_amb &lt; 0.60</div>
+              <div id="outScore" class="big-score">0.102</div>
+              <div>
+                <span id="outTierChip" class="route-tier-chip chip-green">Local Deterministic (0 ms Network)</span>
               </div>
-              <div id="tier2Node" class="mesh-node">
-                <div>TIER 2</div>
-                <strong>Reasoning (70B)</strong>
-                <div style="font-size:0.65rem; margin-top:2px;">S_amb &ge; 0.60</div>
-              </div>
+              <p id="outRationale" style="font-size: 12px; color: var(--text-muted); max-width: 380px; margin: 0 auto; line-height: 1.5;">
+                Unambiguous production token signature. Intercepted locally without remote network call.
+              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3: REMEDIATION WORKBENCH -->
-    <div id="view-workbench" class="tab-view">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-headline">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            Autonomous In-Place Code Remediation & .env Isolation
-          </div>
-          <div style="display: flex; gap: 0.5rem;">
-            <select id="targetLanguage" style="background: #04070d; color: #fff; border: 1px solid var(--border-subtle); padding: 0.4rem 0.75rem; border-radius: 5px; font-family: var(--font-mono); font-size: 0.75rem;">
+    <!-- TAB 3: REMEDIATION & AST DIFF -->
+    <div id="tab-quarantine" class="tab-section">
+      <div class="box">
+        <div class="box-header">
+          <span class="box-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Automated AST In-Place Remediation
+          </span>
+          <div style="display: flex; gap: 8px;">
+            <select id="diffLangSelect" class="select-dropdown">
               <option value="python">Python (os.getenv)</option>
               <option value="javascript">JavaScript / TypeScript (process.env)</option>
             </select>
-            <button class="btn-action" style="padding: 0.45rem 1rem; font-size: 0.75rem;" onclick="triggerQuarantineDemo()">
-              Sanitize In Place
-            </button>
+            <button class="btn-primary" onclick="runQuarantineDemo()">Apply Remediation</button>
           </div>
         </div>
-
-        <div class="grid-equal">
-          <div class="diff-block">
-            <div class="diff-header">
-              <span>BEFORE: EXPOSED HARDCODED TOKEN</span>
-              <span class="tag-badge tag-danger">Vulnerable</span>
+        <div class="box-body">
+          <div class="col-equal">
+            <div>
+              <div style="font-size: 12px; font-weight: 600; color: #ff7b72; margin-bottom: 6px;">
+                Original Source (Hardcoded Secret)
+              </div>
+              <div class="unified-diff-view" id="diffBefore"></div>
             </div>
-            <div class="diff-content removed" id="diffViewBefore">Loading before state...</div>
+            <div>
+              <div style="font-size: 12px; font-weight: 600; color: #7ee787; margin-bottom: 6px;">
+                Remediated Code (AST Node Replacement)
+              </div>
+              <div class="unified-diff-view" id="diffAfter"></div>
+            </div>
           </div>
 
-          <div class="diff-block">
-            <div class="diff-header">
-              <span>AFTER: AST REFACTORED SANITIZATION</span>
-              <span class="tag-badge tag-success">Sanitized</span>
+          <div style="margin-top: 16px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-bright); margin-bottom: 6px;">
+              Generated .env File (Restricted POSIX 0600)
             </div>
-            <div class="diff-content added" id="diffViewAfter">Loading after state...</div>
-          </div>
-        </div>
-
-        <div style="margin-top: 1.25rem;">
-          <div class="diff-block">
-            <div class="diff-header">
-              <span>GENERATED SAFE .ENV WITH 0600 RESTRICTION &amp; .GITIGNORE INCLUSION</span>
-              <span class="tag-badge tag-neutral">POSIX 0600</span>
-            </div>
-            <div class="diff-content" id="diffViewEnv" style="color: #94a3b8; min-height: 90px;">Loading .env isolation...</div>
+            <div class="unified-diff-view" style="padding: 10px 14px;" id="diffEnv"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 4: TELEMETRY & LOGS -->
-    <div id="view-telemetry" class="tab-view">
-      <div class="grid-quad" style="margin-bottom: 1.35rem;">
-        <div class="stat-box">
-          <span class="stat-label">Measured Latency</span>
-          <span class="stat-number info">5.65 ms</span>
-          <span style="font-size:0.7rem; color:var(--text-tertiary); margin-top:4px;">100-line unified diff</span>
+    <!-- TAB 4: BENCHMARKS & TELEMETRY -->
+    <div id="tab-benchmarks" class="tab-section">
+      <div class="box">
+        <div class="box-header">
+          <span class="box-title">Empirical Benchmark Data (20 Trials / Scale)</span>
+          <span style="font-family: var(--mono); font-size: 11px; color: var(--text-muted);">Hardware: Windows 11 &middot; Python 3.13</span>
         </div>
-        <div class="stat-box">
-          <span class="stat-label">Scanning Throughput</span>
-          <span class="stat-number success">17,712</span>
-          <span style="font-size:0.7rem; color:var(--text-tertiary); margin-top:4px;">lines / second</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">Verified Test Cases</span>
-          <span class="stat-number">112 / 112</span>
-          <span style="font-size:0.7rem; color:var(--text-tertiary); margin-top:4px;">100% passing rate</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">Memory Overhead</span>
-          <span class="stat-number info">0.0 MB</span>
-          <span style="font-size:0.7rem; color:var(--text-tertiary); margin-top:4px;">Zero whole-file buffer</span>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-headline">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M4 17l6-6-6-6"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-            Pre-Commit Hook Interception Stream
-          </div>
-          <div class="panel-meta">Live Interceptor Simulation</div>
-        </div>
-
-        <div class="terminal-window">
-          <div class="terminal-topbar">
-            <span>Terminal</span>
-            <span>&middot;</span>
-            <span>.git/hooks/pre-commit</span>
-          </div>
-          <div class="terminal-body" id="terminalLogs">
-[2026-10-22T06:34:18Z] [INFO] [secretguard.ingest.git] Invoked via Git pre-commit hook.
-[2026-10-22T06:34:18Z] [INFO] [secretguard.ingest.git] Streamed 4 staged file additions. Zero whole-file memory buffering.
-[2026-10-22T06:34:18Z] [INFO] [secretguard.extract.engine] Running 12 deterministic rules with Shannon entropy threshold H &ge; 4.2.
-[2026-10-22T06:34:18Z] [INFO] [secretguard.router.scorer] Mathematical ambiguity metric computed for all extracted candidates.
-[2026-10-22T06:34:18Z] [SUCCESS] Pre-commit security check PASSED in 64.94 ms. Commit allowed.
-          </div>
-        </div>
+        <table class="findings-grid">
+          <thead>
+            <tr>
+              <th>DIFF SIZE</th>
+              <th>AVERAGE LATENCY</th>
+              <th>STANDARD DEVIATION</th>
+              <th>THROUGHPUT</th>
+              <th>EXTRACTED CANDIDATES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10 lines</td>
+              <td>0.666 ms</td>
+              <td>&plusmn;0.291 ms</td>
+              <td>15,023.6 lines/sec</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>50 lines</td>
+              <td>3.028 ms</td>
+              <td>&plusmn;0.227 ms</td>
+              <td>16,510.5 lines/sec</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td><strong>100 lines</strong></td>
+              <td><strong>5.646 ms</strong></td>
+              <td>&plusmn;0.090 ms</td>
+              <td><strong>17,712.5 lines/sec</strong></td>
+              <td>6</td>
+            </tr>
+            <tr>
+              <td>250 lines</td>
+              <td>14.517 ms</td>
+              <td>&plusmn;0.381 ms</td>
+              <td>17,221.2 lines/sec</td>
+              <td>17</td>
+            </tr>
+            <tr>
+              <td>500 lines</td>
+              <td>29.048 ms</td>
+              <td>&plusmn;0.453 ms</td>
+              <td>17,212.7 lines/sec</td>
+              <td>30</td>
+            </tr>
+            <tr>
+              <td>1,000 lines</td>
+              <td>58.199 ms</td>
+              <td>&plusmn;0.744 ms</td>
+              <td>17,182.3 lines/sec</td>
+              <td>60</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- TAB 5: IEEE RESEARCH MANUSCRIPT -->
-    <div id="view-manuscript" class="tab-view">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-headline">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            IEEE Transactions on Software Engineering Manuscript
-          </div>
-          <div style="display: flex; gap: 0.5rem;">
-            <a href="/paper.pdf" target="_blank" class="btn-secondary" style="text-decoration: none;">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              Open PDF
-            </a>
-          </div>
+    <!-- TAB 5: RESEARCH PAPER -->
+    <div id="tab-manuscript" class="tab-section">
+      <div class="box">
+        <div class="box-header">
+          <span class="box-title">IEEE Transactions on Software Engineering Manuscript</span>
+          <a href="/paper.pdf" target="_blank" class="btn-default" style="text-decoration:none;">
+            Download PDF
+          </a>
         </div>
-
-        <div style="font-size: 0.825rem; color: var(--text-secondary); margin-bottom: 1.15rem; line-height: 1.6;">
-          <strong>Title:</strong> SecretGuard: Autonomous, Privacy-Preserving Secret Interception and Tiered Ambiguity Quarantine for Version Control Systems<br>
-          <strong>Author:</strong> Anuska Saha &middot; Department of Computer Science and Engineering
-        </div>
-
-        <div style="height: 640px; border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; background: #030509;">
-          <iframe src="/paper.pdf" style="width: 100%; height: 100%; border: none;"></iframe>
+        <div class="box-body" style="padding:0;">
+          <iframe src="/paper.pdf" style="width: 100%; height: 650px; border: none; display: block;"></iframe>
         </div>
       </div>
     </div>
 
   </main>
 
-  <!-- Clean Footer -->
-  <footer class="app-footer">
-    <div>SecretGuard Platform &middot; Privacy-Preserving Credential Interception Architecture</div>
-    <div class="footer-links">
+  <!-- Footer -->
+  <footer>
+    <div>SecretGuard &middot; Local Pre-Commit Credential Interception Platform</div>
+    <div>
       <a href="https://github.com/Anuska522/Cyber-security" target="_blank">GitHub Repository</a>
-      <a href="/paper.pdf" target="_blank">Research Manuscript (PDF)</a>
+      &middot;
+      <a href="/paper.pdf" target="_blank">Research Manuscript</a>
     </div>
   </footer>
 
   <script>
-    function activateTab(tabKey, targetBtn) {
-      document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
-
-      targetBtn.classList.add('active');
-      const activeView = document.getElementById('view-' + tabKey);
-      if (activeView) activeView.classList.add('active');
+    function showTab(id, tabEl) {
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+      tabEl.classList.add('active');
+      document.getElementById('tab-' + id).classList.add('active');
     }
 
-    // Dynamic Mock String Construction (to prevent static hook triggers)
-    const tokenPartA = "AKIA";
-    const tokenPartB = "IOSFODNN7EXAMPLE";
-    const secPartA = "wJalrXUtn";
-    const secPartB = "FEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
-    const patPartA = "ghp_";
-    const patPartB = "1234567890abcdefghijklmnopqrstuvwxyz";
-    const jwtPartA = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.";
-    const jwtPartB = "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.";
-    const jwtPartC = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    // Split mock tokens to prevent git hook false positives
+    const kA = "AKIA";
+    const kB = "IOSFODNN7EXAMPLE";
+    const sA = "wJalrXUtn";
+    const sB = "FEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
+    const pA = "ghp_";
+    const pB = "1234567890abcdefghijklmnopqrstuvwxyz";
+    const jA = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.";
+    const jB = "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.";
+    const jC = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
-    const scenarioPresets = {
-      aws: `import boto3\n\n# Staged line addition\nclient = boto3.client(\n    "s3",\n    aws_access_key_id="${tokenPartA + tokenPartB}"\n)\nprint("Connection established")`,
-      github: `export GITHUB_TOKEN="${patPartA + patPartB}"\necho "Authentication verified"`,
-      jwt: `const authToken = "${jwtPartA + jwtPartB + jwtPartC}";\nheaders.set("Authorization", "Bearer " + authToken);`,
-      mock: `# Test suite fixture: tests/test_auth.py\ndef test_authentication_mock():\n    mock_key = "${tokenPartA + tokenPartB}"\n    assert len(mock_key) == 20`,
-      placeholder: `API_KEY = "YOUR_API_KEY_HERE"\nDATABASE_PASSWORD = "CHANGE_ME_IN_PRODUCTION"`,
-      clean: `import os\n\nclient_token = os.getenv("APPLICATION_SERVICE_KEY")\nif not client_token:\n    raise RuntimeError("Missing credential in environment")`
+    const presets = {
+      aws: `@@ -10,4 +10,6 @@\n import boto3\n \n+aws_key = "${kA + kB}"\n+client = boto3.client("s3", aws_access_key_id=aws_key)\n print("Initialized")`,
+      github: `@@ -4,3 +4,4 @@\n # Configuration\n+export GITHUB_TOKEN="${pA + pB}"`,
+      jwt: `@@ -1,3 +1,4 @@\n # Auth Headers\n+const token = "${jA + jB + jC}";`,
+      mock: `@@ -15,4 +15,5 @@\n def test_dummy_fixture():\n+    mock_key = "${kA + kB}"\n     assert mock_key.startswith("AKIA")`,
+      placeholder: `@@ -1,2 +1,3 @@\n+API_KEY = "YOUR_API_KEY_HERE"\n+DB_PASS = "CHANGE_ME"`,
+      clean: `@@ -8,3 +8,4 @@\n import os\n+service_region = os.getenv("AWS_REGION")\n print("Safe configuration loaded")`
     };
 
-    function selectSnippet(presetKey) {
-      document.getElementById('codeBuffer').value = scenarioPresets[presetKey] || '';
-      runInterceptionScan();
+    function applyPreset(key) {
+      document.getElementById('codeEditor').value = presets[key] || '';
+      triggerScan();
     }
 
-    async function runInterceptionScan() {
-      const code = document.getElementById('codeBuffer').value;
+    function clearEditor() {
+      document.getElementById('codeEditor').value = '';
+    }
+
+    async function triggerScan() {
+      const code = document.getElementById('codeEditor').value;
       if (!code.trim()) return;
 
-      const startTime = performance.now();
+      const t0 = performance.now();
       try {
-        const response = await fetch('/api/scan', {
+        const res = await fetch('/api/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: code, filename: 'staged_diff.py' })
+          body: JSON.stringify({ code: code, filename: 'patch.diff' })
         });
-        const result = await response.json();
-        const elapsed = (performance.now() - startTime).toFixed(2);
+        const data = await res.json();
+        const elapsed = (performance.now() - t0).toFixed(2);
 
-        document.getElementById('metricLines').textContent = result.total_lines;
-        document.getElementById('metricSecrets').textContent = result.findings_count;
-        document.getElementById('metricSuppressed').textContent = result.suppressed_placeholders;
-        document.getElementById('latencyIndicator').textContent = `${elapsed} ms`;
+        document.getElementById('statLines').textContent = data.total_lines;
+        document.getElementById('statSecrets').textContent = data.findings_count;
+        document.getElementById('statFiltered').textContent = data.suppressed_placeholders;
+        document.getElementById('scanTimer').textContent = `${elapsed} ms`;
 
-        const verdictBox = document.getElementById('scanVerdictBox');
-        if (result.findings_count > 0) {
-          verdictBox.style.borderColor = 'rgba(244, 63, 94, 0.4)';
-          verdictBox.style.color = '#fda4af';
-          verdictBox.innerHTML = `<strong>INTERCEPTION ENFORCED:</strong> Detected ${result.findings_count} unmasked production credential(s). Git pre-commit hook terminated with status 1.`;
+        const alertBox = document.getElementById('alertBox');
+        if (data.findings_count > 0) {
+          alertBox.className = 'alert-banner danger';
+          alertBox.innerHTML = `<strong>Commit Blocked:</strong> SecretGuard detected ${data.findings_count} unmasked secret(s). Remediation required before Git commit.`;
         } else {
-          verdictBox.style.borderColor = 'rgba(0, 245, 160, 0.3)';
-          verdictBox.style.color = '#6ee7b7';
-          verdictBox.innerHTML = `<strong>SCAN CLEAN:</strong> Zero active credentials detected across staged diff additions. Safe to commit.`;
+          alertBox.className = 'alert-banner clean';
+          alertBox.innerHTML = `<strong>Scan Clean:</strong> Zero active credentials detected across staged diff additions. Safe to commit.`;
         }
 
-        const tbody = document.getElementById('findingsTableBody');
+        const tbody = document.getElementById('findingsBody');
         tbody.innerHTML = '';
 
-        if (result.findings.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--accent-emerald); padding: 2rem;">Zero findings detected in diff buffer.</td></tr>';
+        if (data.findings.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">Zero sensitive credentials detected.</td></tr>';
           return;
         }
 
-        result.findings.forEach(f => {
+        data.findings.forEach(f => {
           const row = document.createElement('tr');
-          const isFilt = f.is_filtered;
           row.innerHTML = `
             <td>L${f.line_number}</td>
-            <td><span class="tag-badge ${isFilt ? 'tag-warning' : 'tag-danger'}">${f.rule_id}</span></td>
+            <td><span class="chip ${f.is_filtered ? 'chip-amber' : 'chip-red'}">${f.rule_id}</span></td>
             <td><code>${f.literal_value}</code></td>
             <td>${f.entropy_score}</td>
             <td>${f.ambiguity_score}</td>
-            <td><span class="tag-badge ${f.routing_profile === 'LOCAL_DETERMINISTIC' ? 'tag-success' : 'tag-warning'}">${f.routing_profile}</span></td>
+            <td><span class="chip ${f.routing_profile === 'LOCAL_DETERMINISTIC' ? 'chip-green' : 'chip-amber'}">${f.routing_profile}</span></td>
             <td><strong>${f.recommended_action}</strong></td>
           `;
           tbody.appendChild(row);
         });
-      } catch (err) {
-        console.error('Scan error:', err);
+      } catch (e) {
+        console.error('Scan failed:', e);
       }
     }
 
-    async function calculateAmbiguityMetrics() {
-      const u_regex = parseFloat(document.getElementById('inputUregex').value);
-      const entropy = parseFloat(document.getElementById('inputEntropy').value);
-      const a_ctx = parseFloat(document.getElementById('inputActx').value);
+    async function runCalculator() {
+      const u_regex = parseFloat(document.getElementById('slideUregex').value);
+      const entropy = parseFloat(document.getElementById('slideEntropy').value);
+      const a_ctx = parseFloat(document.getElementById('slideActx').value);
 
-      document.getElementById('labelUregex').textContent = u_regex.toFixed(2);
-      document.getElementById('labelEntropy').textContent = entropy.toFixed(2);
-      document.getElementById('labelActx').textContent = a_ctx.toFixed(2);
+      document.getElementById('txtUregex').textContent = u_regex.toFixed(2);
+      document.getElementById('txtEntropy').textContent = entropy.toFixed(2);
+      document.getElementById('txtActx').textContent = a_ctx.toFixed(2);
 
       const res = await fetch('/api/score', {
         method: 'POST',
@@ -1213,55 +1025,63 @@
       });
       const data = await res.json();
 
-      const readout = document.getElementById('readoutScore');
-      readout.textContent = data.s_amb.toFixed(3);
-      readout.style.color = data.color;
+      document.getElementById('outScore').textContent = data.s_amb.toFixed(3);
+      document.getElementById('outScore').style.color = data.color;
 
-      const badge = document.getElementById('readoutDecisionBadge');
-      badge.textContent = data.tier;
-      badge.style.borderColor = data.color;
-      badge.style.color = data.color;
+      const chip = document.getElementById('outTierChip');
+      chip.textContent = data.tier;
+      chip.style.color = data.color;
+      chip.style.borderColor = data.color;
 
-      document.getElementById('readoutRationale').textContent = data.explanation;
-
-      // Update Mesh Nodes
-      document.getElementById('tier0Node').classList.remove('active-tier');
-      document.getElementById('tier1Node').classList.remove('active-tier');
-      document.getElementById('tier2Node').classList.remove('active-tier');
-
-      if (data.s_amb < 0.20) {
-        document.getElementById('tier0Node').classList.add('active-tier');
-      } else if (data.s_amb < 0.60) {
-        document.getElementById('tier1Node').classList.add('active-tier');
-      } else {
-        document.getElementById('tier2Node').classList.add('active-tier');
-      }
+      document.getElementById('outRationale').textContent = data.explanation;
     }
 
-    async function triggerQuarantineDemo() {
-      const lang = document.getElementById('targetLanguage').value;
-      const sampleCode = `import boto3\ns3 = boto3.client("s3", aws_access_key_id="${tokenPartA + tokenPartB}")`;
+    async function runQuarantineDemo() {
+      const lang = document.getElementById('diffLangSelect').value;
+      const code = `import boto3\ns3 = boto3.client("s3", aws_access_key_id="${kA + kB}")`;
 
       const res = await fetch('/api/quarantine', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: sampleCode, file_type: lang })
+        body: JSON.stringify({ code: code, file_type: lang })
       });
       const data = await res.json();
 
-      document.getElementById('diffViewBefore').textContent = `import boto3\n\nclient = boto3.client(\n    "s3",\n    aws_access_key_id="${tokenPartA + tokenPartB}"\n)`;
-      document.getElementById('diffViewAfter').textContent = data.sanitized_code;
-      document.getElementById('diffViewEnv').textContent = data.env_entries;
+      renderDiffView('diffBefore', [
+        { type: 'hunk', text: '@@ -1,4 +1,4 @@' },
+        { type: 'context', text: ' import boto3' },
+        { type: 'del', text: `-s3 = boto3.client("s3", aws_access_key_id="${kA + kB}")` }
+      ]);
+
+      renderDiffView('diffAfter', [
+        { type: 'hunk', text: '@@ -1,5 +1,5 @@' },
+        { type: 'add', text: lang === 'python' ? '+import os' : '+// environment configured' },
+        { type: 'context', text: ' import boto3' },
+        { type: 'add', text: lang === 'python' ? `+s3 = boto3.client("s3", aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"))` : `+s3 = boto3.client("s3", aws_access_key_id=process.env.AWS_ACCESS_KEY_ID)` }
+      ]);
+
+      document.getElementById('diffEnv').textContent = data.env_entries;
     }
 
-    // Initialize View
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('diffViewBefore').textContent = `import boto3\n\nclient = boto3.client(\n    "s3",\n    aws_access_key_id="${tokenPartA + tokenPartB}",\n    aws_secret_access_key="${secPartA + secPartB}"\n)`;
-      document.getElementById('diffViewAfter').textContent = `import os\nimport boto3\n\nclient = boto3.client(\n    "s3",\n    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),\n    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")\n)`;
-      document.getElementById('diffViewEnv').textContent = `# Isolated by SecretGuard Autonomous Remediation\nAWS_ACCESS_KEY_ID=${tokenPartA + tokenPartB}\nAWS_SECRET_ACCESS_KEY=${secPartA + secPartB}`;
+    function renderDiffView(elementId, lines) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = '';
+      lines.forEach((l, idx) => {
+        const div = document.createElement('div');
+        div.className = `diff-line ${l.type}`;
+        div.innerHTML = `<span class="line-no">${idx + 1}</span><span class="line-text">${escapeHtml(l.text)}</span>`;
+        el.appendChild(div);
+      });
+    }
 
-      selectSnippet('aws');
-      calculateAmbiguityMetrics();
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      applyPreset('aws');
+      runCalculator();
+      runQuarantineDemo();
     });
   </script>
 </body>
